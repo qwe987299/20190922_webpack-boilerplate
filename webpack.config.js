@@ -1,43 +1,66 @@
 const path = require("path");
 const rootPath = path.join(__dirname,'./');
 
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 //抽出css檔案
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const extractSass = new MiniCssExtractPlugin({
-    filename: "[name].min.css", //filename: "[name].[contenthash].css",
-    chunkFilename: '[id].css',
-    ignoreOrder: false, // Enable to remove warnings about conflicting order
-});
-
 module.exports = {
-    mode:'development',
+    mode: process.env.NODE_ENV || 'development',
     entry: {
-        styles: `${rootPath}src/styles/index.scss`,
+        main: `./src/index.js`,
     },
     output: {
-        filename: '[name].js',
+        filename: '[name].[chunkhash].js',
         path: path.resolve(__dirname, 'build')
     },
+    devtool: 'source-map',
     module: {
         rules: [
             {
                 test: /\.(sa|sc|c)ss$/,
                 use: [
                     {
-                        loader: MiniCssExtractPlugin.loader,
-                        options: {
-                            hmr: true,
-                            reloadAll: true,
-                        },
+                        loader: MiniCssExtractPlugin.loader
                     },
-                    'css-loader',
-                    'sass-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            module: false,
+                            sourceMap: true
+                        }
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            sourceMap: true
+                        }
+                    },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            sourceMap: true
+                        }
+                    }
                 ],
             }
         ]   //rules end
     },
     plugins: [
-        extractSass,
-    ]
+        new MiniCssExtractPlugin({
+            filename: 'style.css',
+        }),
+        new HtmlWebpackPlugin({
+            inject: false,
+            hash: false,
+            template: './src/index.html',
+            filename: 'index.html'
+        })
+    ],
+    devServer: {
+        open: true,
+        contentBase: path.join(__dirname, '.'),
+        compress: true,
+        port: 9000
+    }
 };
