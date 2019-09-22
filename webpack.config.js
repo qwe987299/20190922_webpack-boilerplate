@@ -6,6 +6,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 //自動產生html 靜態檔案對應
 // const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPligin = require('copy-webpack-plugin');
+const WriteFilePlugin = require('write-file-webpack-plugin');
 
 module.exports = {
     mode: process.env.NODE_ENV || 'development',
@@ -45,6 +47,19 @@ module.exports = {
                         }
                     }
                 ],
+            },
+            {
+                test: /\.{jpe?g|png|gif|svg}$/,
+                use: [
+                    {
+                        loader: 'url-loader',
+                        options: {limit: 1000}
+                    },
+                    {
+                        loader: 'image-webpack-loader',
+                        options: {byPassOnDebug: true}
+                    }
+                ]
             }
         ]   //rules end
     },
